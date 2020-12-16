@@ -1,8 +1,7 @@
+import { HTML } from "../config/detail.page";
 
-class FuncGlobal {
-    constructor() {
-    }
-
+// module SomeModule {
+export class FuncGlobal {
     selector(selector: string) {
         if (!selector) {
             return;
@@ -119,3 +118,4 @@ class FuncGlobal {
     }
 
 }
+// }

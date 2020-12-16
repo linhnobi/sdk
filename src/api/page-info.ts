@@ -1,4 +1,4 @@
-interface IPageInfo {
+export interface IPageInfo {
     id?: string | null;
     brand?: string | null;
     cats?: any;

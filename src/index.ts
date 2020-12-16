@@ -1,21 +1,22 @@
-// import { FuncGlobal } from './common/function';
+// import { IPageInfo } from './api/page-info';
+import { FireBase } from "./common/firebase";
+import { FuncGlobal } from "./common/function";
+import { ConfigDetailPage } from "./config/detail.page";
+import { HttpRequestService } from "./service/http-request";
 
-// import { FuncGlobal } from "./common/function";
-
-// import  HttpRequestService  from "./service/http-request";
-
-// / <reference path="common/function.ts" />
 class SDK {
     timeOnsite = 5;
     funcGlobal = new FuncGlobal();
-    // httpRequest = new HttpRequestService();
+    httpRequest = new HttpRequestService();
     constructor() {
 
     }
 
-    start() {
+    start(document?: any) {
+        const firebase = new FireBase();
+        firebase.init();
         // console.log('test', document);
-        
+        console.log('111111111111');
         
         // const data = this.funcGlobal.getValueToHTMLByClass('css-15dagt2');
         // console.log('data', data);
@@ -47,28 +48,54 @@ class SDK {
         const brand = this.funcGlobal.getValueToHTML(ConfigDetailPage.PRODUCT_BRAND);
         console.log('brand :', brand);
 
-        let pageInfo: IPageInfo = {};
-        pageInfo.url = document.URL;
-        pageInfo.referrer = document.referrer;
-        pageInfo.description = document.title;
-        pageInfo.name = name;
-        pageInfo.originalPrice = originalPrice;
-        pageInfo.price = price;
-        pageInfo.id = id;
-        pageInfo.img = img;
-        pageInfo.brand = brand;
-        const list = document.querySelectorAll('.breadcrumb__item');
-        let cats = []
-        for (var i = 0; i < list.length - 1; i++) {   
-            cats.push(list[i].textContent?.trim());
+        // let pageInfo:  any;
+        // pageInfo.url = document.URL;
+        // pageInfo.referrer = document.referrer;
+        // pageInfo.description = document.title;
+        // pageInfo.name = name;
+        // pageInfo.originalPrice = originalPrice;
+        // pageInfo.price = price;
+        // pageInfo.id = id;
+        // pageInfo.img = img;
+        // pageInfo.brand = brand;
+        // const list = document.querySelectorAll('.breadcrumb__item');
+        // let cats = []
+        // for (var i = 0; i < list.length - 1; i++) {   
+        //     cats.push(list[i].textContent?.trim());
+        // }
+        // console.log('cats :', cats);
+        // pageInfo.cats = cats;
+        // console.log(JSON.stringify(pageInfo));
+        const url = 'https://api-test1.mobio.vn/digienty/web/api/v1.0/track.json';
+        const data = {
+            "track": {
+                "profile_id": null,
+                "device_id": null,
+                "customer_id": null,
+                "type": "checkin",
+                "info": {
+                    "url": url
+                },
+            },
+            "meta_data": {
+                "source_type": "browser",
+                "website": {
+                    "domain": null
+                },
+                "app": {
+                    "id": null,
+                    "name": null,
+                    "device_type": null,
+                    "device_name": null
+                }
+            }
         }
-        console.log('cats :', cats);
-        pageInfo.cats = cats;
-        console.log(JSON.stringify(pageInfo));
+        const result = this.httpRequest.post(url, data);
+        console.log('result :', result);
     }
 
     getPageInfo() {
-        let pageInfo: IPageInfo = {};
+        let pageInfo: any = {};
         pageInfo.url = document.URL;
         pageInfo.referrer = document.referrer;
         pageInfo.description = document.title;
@@ -77,7 +104,7 @@ class SDK {
         console.log(JSON.stringify(pageInfo));
     }
 
-    listenGTM(track: string) {
+    listenGTM(track: string | 'test') {
         console.log('track :', track);
         
     }
@@ -249,5 +276,6 @@ class SDK {
     
 }
 
-// var app = new SDK();
-// app.start();
+let g = new SDK();
+g.start();
+(window as any).SDK = g

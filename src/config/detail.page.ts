@@ -1,9 +1,9 @@
-class HTML {
+export class HTML {
     public static readonly INNER_TEXT = 'innerText';
     public static readonly ATTRIBUTE = 'attribute';
 }
 
-class ConfigDetailPage {
+export class ConfigDetailPage {
     public static readonly PRODUCT_NAME = {
         SELECTOR: '#main_container > div.main-column > div.product > div.frame_center > div > div.product_name > h1',
         TYPE: HTML.INNER_TEXT,
