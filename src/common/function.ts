@@ -1,7 +1,40 @@
+import { ConfigSDK } from "../config/config";
 import { HTML } from "../config/detail.page";
 
 // module SomeModule {
 export class FuncGlobal {
+
+    /**
+     * Check and return safari browser
+     */
+    detectSafariBrowser() {
+        if ('safari' in window && 'pushNotification' in window['safari']) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Return Generate Unique ID
+     */
+    private generateUniqueID() {
+        const strStart = Math.random().toString(36).substr(2, 9);
+        const strEnd = Math.random().toString(36).substr(2, 10);
+        const now = Date.now();
+        return `${strStart}${now}${strEnd}`;
+    }
+    
+    createDraftDevice() {
+        const deviceID = window.localStorage.getItem(ConfigSDK.DRAFT_DEVICE_ID);
+        if (deviceID) {
+            return;
+        }
+
+        const draftDeviceID = this.generateUniqueID();
+        window.localStorage.setItem(ConfigSDK.DRAFT_DEVICE_ID, draftDeviceID);
+    }
+
+
     selector(selector: string) {
         if (!selector) {
             return;

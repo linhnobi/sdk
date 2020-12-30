@@ -20,4 +20,23 @@ export class GetDataPage {
         });
         return results;
     }
+
+    /**
+     * Return domain of website
+     */
+    getDomain(): string {
+        const url = window.document.URL;
+        let domain;
+        const regex = /^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/?\n]+)/igm;;
+        let m;
+
+        while ((m = regex.exec(url)) !== null) {
+            if (m.index === regex.lastIndex) {
+                regex.lastIndex++;
+            }
+            domain = m[1];
+        }
+
+        return domain;
+    }
 }

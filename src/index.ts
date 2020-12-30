@@ -1,22 +1,35 @@
+import { Track } from './common/track';
 // import { IPageInfo } from './api/page-info';
+import { IHttpResponse } from "./api/http";
 import { FireBase } from "./common/firebase";
 import { FuncGlobal } from "./common/function";
+import { F5 } from "./common/util/f5";
 import { ConfigDetailPage } from "./config/detail.page";
+import { SERVICE_URL } from "./config/service";
 import { HttpRequestService } from "./service/http-request";
 
-class SDK {
-    timeOnsite = 5;
-    funcGlobal = new FuncGlobal();
-    httpRequest = new HttpRequestService();
-    constructor() {
+export class SDK {
+    // timeOnsite = 5;
+    private funcGlobal = new FuncGlobal();
+    private httpRequest = new HttpRequestService();
+    private firebase = new FireBase();
+    private f5 = new F5();
+    private track = new Track(this.httpRequest);
+    constructor() {}
 
-    }
+    async start(document?: any) {
+        this.f5.addJS();
+        this.funcGlobal.createDraftDevice();
+        const isSafari = this.funcGlobal.detectSafariBrowser();
+        if (isSafari) {
+            return;
+        }
 
-    start(document?: any) {
-        const firebase = new FireBase();
-        firebase.init();
-        // console.log('test', document);
-        console.log('111111111111');
+        
+        const configFireBase = await this.getConfigFireBase();
+        this.firebase.init(configFireBase);
+        // console.log('configFireBase', configFireBase);
+        // console.log('111111111111');
         
         // const data = this.funcGlobal.getValueToHTMLByClass('css-15dagt2');
         // console.log('data', data);
@@ -30,23 +43,23 @@ class SDK {
         // if (document.readyState) {
         //     this.getPageInfo();
         // }
-        const name = this.funcGlobal.getValueToHTML(ConfigDetailPage.PRODUCT_NAME);
-        console.log('name :', name);
+        // const name = this.funcGlobal.getValueToHTML(ConfigDetailPage.PRODUCT_NAME);
+        // console.log('name :', name);
 
-        const id = this.funcGlobal.getValueToHTML(ConfigDetailPage.PRODUCT_ID);
-        console.log('id :', id);
+        // const id = this.funcGlobal.getValueToHTML(ConfigDetailPage.PRODUCT_ID);
+        // console.log('id :', id);
 
-        const originalPrice = this.funcGlobal.getValueToHTML(ConfigDetailPage.PRODUCT_ORIGINAL_PRICE);
-        console.log('originalPrice :', originalPrice);
+        // const originalPrice = this.funcGlobal.getValueToHTML(ConfigDetailPage.PRODUCT_ORIGINAL_PRICE);
+        // console.log('originalPrice :', originalPrice);
 
-        const price = this.funcGlobal.getValueToHTML(ConfigDetailPage.PRODUCT_PRICE);
-        console.log('price :', price);
+        // const price = this.funcGlobal.getValueToHTML(ConfigDetailPage.PRODUCT_PRICE);
+        // console.log('price :', price);
 
-        const img = this.funcGlobal.getValueToHTML(ConfigDetailPage.PRODUCT_IMG);
-        console.log('img :', img);
+        // const img = this.funcGlobal.getValueToHTML(ConfigDetailPage.PRODUCT_IMG);
+        // console.log('img :', img);
 
-        const brand = this.funcGlobal.getValueToHTML(ConfigDetailPage.PRODUCT_BRAND);
-        console.log('brand :', brand);
+        // const brand = this.funcGlobal.getValueToHTML(ConfigDetailPage.PRODUCT_BRAND);
+        // console.log('brand :', brand);
 
         // let pageInfo:  any;
         // pageInfo.url = document.URL;
@@ -66,47 +79,83 @@ class SDK {
         // console.log('cats :', cats);
         // pageInfo.cats = cats;
         // console.log(JSON.stringify(pageInfo));
-        const url = 'https://api-test1.mobio.vn/digienty/web/api/v1.0/track.json';
+        // const url = 'https://api-test1.mobio.vn/digienty/web/api/v1.0/track.json';
+        // const data = {
+        //     "track": {
+        //         "profile_id": null,
+        //         "device_id": null,
+        //         "customer_id": null,
+        //         "type": "checkin",
+        //         "info": {
+        //             "url": url
+        //         },
+        //     },
+        //     "meta_data": {
+        //         "source_type": "browser",
+        //         "website": {
+        //             "domain": null
+        //         },
+        //         "app": {
+        //             "id": null,
+        //             "name": null,
+        //             "device_type": null,
+        //             "device_name": null
+        //         }
+        //     }
+        // }
+        // const result = this.httpRequest.post(url, data);
+        // console.log('result :', result);
+    }
+
+    async getConfigFireBase() {
+
         const data = {
-            "track": {
-                "profile_id": null,
-                "device_id": null,
-                "customer_id": null,
-                "type": "checkin",
-                "info": {
-                    "url": url
-                },
-            },
-            "meta_data": {
-                "source_type": "browser",
-                "website": {
-                    "domain": null
-                },
-                "app": {
-                    "id": null,
-                    "name": null,
-                    "device_type": null,
-                    "device_name": null
+                "meta_data": {
+                    "source_type": "browser",
+                    "website": {
+                        "domain": "test25.mobio.vn"
+                    },
+                    "app": {
+                        "id": null,
+                        "name": null,
+                        "device_type": null,
+                        "device_name": null
+                    }
                 }
-            }
         }
-        const result = this.httpRequest.post(url, data);
-        console.log('result :', result);
+        try {
+            const result: IHttpResponse = await this.httpRequest.post(SERVICE_URL.CONFIG_FIREBASE, data);
+            console.log('result :', result);
+            if (result.code !== 200) {
+                return;
+            }
+
+            const { detail } = result.data.pn;
+            return detail;
+
+        } catch(err) {
+            console.log('err :', err);
+            return;
+        } 
     }
 
     getPageInfo() {
-        let pageInfo: any = {};
-        pageInfo.url = document.URL;
-        pageInfo.referrer = document.referrer;
-        pageInfo.description = document.title;
-        pageInfo.name = this.funcGlobal.getValueToHTML(ConfigDetailPage.PRODUCT_NAME);
-        // pageInfo.originalPrice = this.funcGlobal.getValueToHTML(ConfigDetailPage.PRODUCT_NAME);
-        console.log(JSON.stringify(pageInfo));
+        // let pageInfo: any = {};
+        // pageInfo.url = document.URL;
+        // pageInfo.referrer = document.referrer;
+        // pageInfo.description = document.title;
+        // pageInfo.name = this.funcGlobal.getValueToHTML(ConfigDetailPage.PRODUCT_NAME);
+        // // pageInfo.originalPrice = this.funcGlobal.getValueToHTML(ConfigDetailPage.PRODUCT_NAME);
+        // console.log(JSON.stringify(pageInfo));
     }
 
-    listenGTM(track: string | 'test') {
+    async listenGTM(track: string) {
         console.log('track :', track);
-        
+        // if (track !== 'view') {
+        //     return;
+        // }
+        const data = {};
+        await this.track.inti(track, data);
     }
 
     /**
