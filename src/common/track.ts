@@ -1,3 +1,4 @@
+import { IHttpResponse } from "../api/http";
 import { ConfigSDK } from "../config/config";
 import { SERVICE_URL } from "../config/service";
 import { HttpRequestService } from "../service/http-request";
@@ -11,6 +12,7 @@ export class Track {
 
     async inti(type: string, data: any) {
         console.log('inti track');
+        // console.log('httpRequest2 :', httpRequest2);
         const page = new GetDataPage();
 
         const body = {
@@ -38,9 +40,17 @@ export class Track {
         }
 
         try {
-            console.log('11111');
-            const result = await this.httpRequest.post(SERVICE_URL.TRACK, body);
-            console.log('result :', result);
+            console.log('11111 ? :', this.httpRequest);
+            const result: IHttpResponse = await this.httpRequest.post(SERVICE_URL.TRACK, body);
+            if (result.code !== 200) {
+                return;
+            }
+
+            const data = result.data;
+            // window.localStorage.setItem(ConfigSDK.CUSTOMER_ID, data.customer_id);
+            window.localStorage.setItem(ConfigSDK.PROFILE_ID, data.profile_id);
+            window.localStorage.setItem(ConfigSDK.DEVICE_ID, data.device_id);
+            return;
         } catch (error) {
             console.log('track error :', error);            
         }

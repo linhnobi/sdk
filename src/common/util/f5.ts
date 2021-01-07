@@ -9,6 +9,8 @@ export class F5 {
      * Return _imp_di_ls_
      */
     addJS() {
+        const id = window.localStorage.getItem(ConfigSDK.F5_DI_A);
+        if (id) return;
         var script  = document.createElement('script'); 
         script.src  = ConfigSDK.F5_URL; 
         script.type = 'text/javascript'; 

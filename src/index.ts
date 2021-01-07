@@ -11,13 +11,25 @@ import { HttpRequestService } from "./service/http-request";
 export class SDK {
     // timeOnsite = 5;
     private funcGlobal = new FuncGlobal();
-    private httpRequest = new HttpRequestService();
+    public httpRequest; // = new HttpRequestService();
     private firebase = new FireBase();
     private f5 = new F5();
-    private track = new Track(this.httpRequest);
-    constructor() {}
+    public track;
+    constructor() {
+        this.httpRequest = new HttpRequestService();
+        // this.track = new Track(this.httpRequest);
+        console.log('constructor');
+    }
+
+    async inti() {
+        this.f5.addJS();
+        const configFireBase = await this.getConfigFireBase();
+        this.firebase.init(configFireBase);
+    }
 
     async start(document?: any) {
+        console.log('start');
+        this.funcGlobal.checkNotificationPermission();
         this.f5.addJS();
         this.funcGlobal.createDraftDevice();
         const isSafari = this.funcGlobal.detectSafariBrowser();
@@ -26,8 +38,8 @@ export class SDK {
         }
 
         
-        const configFireBase = await this.getConfigFireBase();
-        this.firebase.init(configFireBase);
+        // const configFireBase = await this.getConfigFireBase();
+        // this.firebase.init(configFireBase);
         // console.log('configFireBase', configFireBase);
         // console.log('111111111111');
         
@@ -108,7 +120,6 @@ export class SDK {
     }
 
     async getConfigFireBase() {
-
         const data = {
                 "meta_data": {
                     "source_type": "browser",
@@ -154,8 +165,12 @@ export class SDK {
         // if (track !== 'view') {
         //     return;
         // }
-        const data = {};
-        await this.track.inti(track, data);
+        const data = {
+            url: window.document.URL
+        };
+        let httpRequest = new HttpRequestService();
+        let trackClass = new Track(httpRequest);
+        await trackClass.inti(track, data);
     }
 
     /**
@@ -326,5 +341,19 @@ export class SDK {
 }
 
 let g = new SDK();
+// g.inti();
 g.start();
-(window as any).SDK = g
+(window as any).SDK = g;
+
+// async function listenGTM(track: string) {
+//     console.log('track :', track);
+//     // if (track !== 'view') {
+//     //     return;
+//     // }
+//     const data = {
+//         url: window.document.URL
+//     };
+//     await this.track.inti(track, data);
+// }
+
+ (window as any).listenGTM = g.listenGTM;

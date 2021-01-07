@@ -11,5 +11,5 @@ export class ConfigSDK {
     public static readonly PROFILE_ID = 'm_profile_id';
     public static readonly DEVICE_ID = 'm_device_id';
     public static readonly U_ID = 'm_u_id';
-    
+    public static readonly CUSTOMER_ID = 'm_customer_id';
 }

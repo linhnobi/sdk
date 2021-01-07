@@ -31,6 +31,7 @@ export class FireBase {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('firebase-messaging-sw.js')
                     .then(registration => {
+                        console.log('registration :', registration);
                         messaging.getToken()
                             .then(token => {
                                 console.log('token :', token);
