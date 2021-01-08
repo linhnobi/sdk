@@ -34,24 +34,64 @@ self.addEventListener('push', (event) => {
     const data = event.data.json();
 
     console.info('data', data);
-//     console.info('data.title', data.title);
-    
+
     var title = data.notification.title;
     var body = {
         body: data.notification.body,
-        tag: data.notification.tag,
-        image: data.notification.image,
+        tag: data.notification.tag || data.data.tag,
+        image: data.notification.image || data.data.image,
+        // requireInteraction: true
     };
 
-    console.info('body', body);
+    console.log('body', body);
+    var messageId = data.data.message_id
+    console.log('messageId', messageId);
+
+    var bodyService = {
+        data: [
+            {
+                id: messageId,
+                type: 'sent',
+                status: 1,
+                reason: 'Success'
+            }
+        ]
+    }
+    const init = {
+        method: 'post',
+        headers : {"Content-Type" : "application/json"},
+        body: JSON.stringify(bodyService),
+    };
+
+    self.fetch('https://api-test1.mobio.vn/nm/webhook/api/v2.0/webhook/channel/webpush/batch', init)
+
     event.waitUntil(
         self.registration.showNotification(title, body)
     );
+
+
+
 });
 
-// self.addEventListener("notificationclick", function (t) {
-//     console.log('notificationclick :', t);
+// self.addEventListener('fetch', function (event) {
+// 	console.log("Request -->", event.request.url);
+
+// 	//To tell browser to evaluate the result of event
+// 	event.respondWith(
+// 		caches.match(event.request) //To match current request with cached request it
+// 		.then(function(response) {
+// 			//If response found return it, else fetch again.
+// 			return response || fetch(event.request);
+// 		})
+// 		.catch(function(error) {
+// 			console.error("Error: ", error);
+// 		})
+//   );
 // });
+
+self.addEventListener("notificationclick", function (t) {
+    console.log('notificationclick :', t);
+});
 
 // // const messaging = firebase.messaging();
 

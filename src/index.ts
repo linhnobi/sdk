@@ -38,8 +38,8 @@ export class SDK {
         }
 
         
-        // const configFireBase = await this.getConfigFireBase();
-        // this.firebase.init(configFireBase);
+        const configFireBase = await this.getConfigFireBase();
+        this.firebase.init(configFireBase);
         // console.log('configFireBase', configFireBase);
         // console.log('111111111111');
         
