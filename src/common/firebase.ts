@@ -1,10 +1,12 @@
 import firebase from 'firebase/app';
 import 'firebase/messaging';
 import { ConfigSDK } from '../config/config';
+import { FuncGlobal } from './function';
 
 export class FireBase {
+    private funcGlobal;
     constructor() {
-
+        this.funcGlobal = new FuncGlobal();
     }
 
     init(config?: any) {
@@ -19,31 +21,80 @@ export class FireBase {
         // };
 
         firebase.initializeApp(config);
-        // console.log('firebase :', firebase);
-        // return firebase;
         const messaging = firebase.messaging();
 
         // console.log('messaging' ,messaging);
-        
+
         // console.log('isSupported :', firebase.messaging.isSupported());
 
+
+        messaging.deleteToken()
+            .then(result => {
+                console.log('result :', result);
+            }).catch(error => {
+                console.error('error :', error);
+            });
+
+        /**
+         * - Register firebase service worker
+         * - Get token in Firebase
+         * - Send permission notification to server
+         */
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('firebase-messaging-sw.js')
                     .then(registration => {
-                        console.log('registration :', registration);
                         messaging.getToken()
                             .then(token => {
-                                console.log('token :', token);
                                 window.localStorage.setItem(ConfigSDK.TOKEN_FIREBASE, token);
+                                this.funcGlobal.sendPermissionToServer(Notification.permission);
                             })
                             .catch(error => {
-                                console.log('error :', error);
-                            })
-                                
+                                window.localStorage.setItem(ConfigSDK.TOKEN_FIREBASE, null);
+                                this.funcGlobal.sendPermissionToServer(Notification.permission);
+                            });
+                    })
+                    .catch(error => {
+                        console.log('registration service worker:', error);
                     });
             })
         }
+
+        /**
+         * - Request permission notification in browser
+         * - Listen value permission notification when user change permission notification of browser
+         * - Send permission notification to server
+         */
+        Notification.requestPermission().then((permission) => {
+            if ('permissions' in navigator) {
+                navigator.permissions.query({ name: 'notifications' })
+                    .then(notificationPerm => {
+                        notificationPerm.onchange = async (status) => {
+                            try {
+                                messaging.getToken()
+                                    .then(token => {
+                                        window.localStorage.setItem(ConfigSDK.TOKEN_FIREBASE, token);
+                                        this.funcGlobal.sendPermissionToServer(notificationPerm.state);
+                                    }).catch(error => {
+                                        if (error.code === "messaging/permission-blocked" || error.code === "messaging/permission-default") {
+                                            console.log("messaging not per");
+                                            window.localStorage.setItem(ConfigSDK.TOKEN_FIREBASE, null);
+                                            this.funcGlobal.sendPermissionToServer(notificationPerm.state);
+                                        } else {
+                                            console.error("Error Occurred", error);
+                                        }
+                                    });
+                            } catch (error) {
+                                console.error('notificationPerm.onchange :', error);
+                            }
+                        }
+                    }).catch(err => {
+                        console.log('navigator.permissions.query :', err);
+                    });
+            }
+        }).catch((err) => {
+            console.log('Notification.requestPermission() :', err);
+        });
 
         // messaging.onMessage((payload) => {
         //     console.log('Message received. ', payload);
@@ -58,18 +109,18 @@ export class FireBase {
         //     //   body: 'Background Message body.',
         //     //   icon: '/firebase-logo.png'
         //     // };
-          
+
         //     // self.registration.showNotification(notificationTitle,
         //     //   notificationOptions);
         //   });
 
-        // messaging.onTokenRefresh(() => {
-        //     messaging.getToken().then((currentToken) => {
-        //         console.log('currentToken :', currentToken);
-        //     //   saveUserToken(currentToken);
-        //     });
-        //   });
-            
+        messaging.onTokenRefresh(() => {
+            messaging.getToken().then((currentToken) => {
+                console.log('currentToken :', currentToken);
+                //   saveUserToken(currentToken);
+            });
+        });
+
 
         // firebase.messaging().
 
@@ -90,13 +141,13 @@ export class FireBase {
         //             })
         //     });
 
-        
+
     }
 
     getFirebase() {
         return firebase;
     }
 
-    
+
 
 }

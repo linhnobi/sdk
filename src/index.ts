@@ -12,7 +12,7 @@ export class SDK {
     // timeOnsite = 5;
     private funcGlobal = new FuncGlobal();
     public httpRequest; // = new HttpRequestService();
-    private firebase = new FireBase();
+    public firebase = new FireBase();
     private f5 = new F5();
     public track;
     constructor() {
@@ -29,17 +29,17 @@ export class SDK {
 
     async start(document?: any) {
         console.log('start');
-        this.funcGlobal.checkNotificationPermission();
         this.f5.addJS();
         this.funcGlobal.createDraftDevice();
         const isSafari = this.funcGlobal.detectSafariBrowser();
         if (isSafari) {
             return;
         }
-
+        
         
         const configFireBase = await this.getConfigFireBase();
         this.firebase.init(configFireBase);
+        // this.funcGlobal.checkNotificationPermission(this.firebase);
         // console.log('configFireBase', configFireBase);
         // console.log('111111111111');
         

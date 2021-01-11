@@ -28,6 +28,9 @@ export class FuncGlobal {
         return `${strStart}${now}${strEnd}`;
     }
 
+    /**
+     * Return draft device ID
+     */
     createDraftDevice() {
         const deviceID = window.localStorage.getItem(ConfigSDK.DRAFT_DEVICE_ID);
         if (deviceID) {
@@ -107,23 +110,30 @@ export class FuncGlobal {
         document.getElementsByTagName('head').item(0).appendChild(script);
     }
 
-    checkNotificationPermission() {
+    /**
+     * Note Using
+     * @param firebase 
+     */
+    checkNotificationPermission(firebase) {
         const body = this.setDataHttp('register_notification_permission', {})
         if (!window.Notification) {
+            body.track.info.token = null;
             body.track.info.permission = 'not_support';
             this.trackService(body);
             return;
         }
 
-        // if (Notification.permission === 'granted') {
-        //     console.log('permission :', Notification.permission);
-        //     body.track.info.permission = 'granted';
-        //     this.trackService(body);
-        //     return;
-        // }
+        if (Notification.permission === 'granted') {
+            console.log('permission :', Notification.permission);
+            body.track.info.token = window.localStorage.getItem(ConfigSDK.TOKEN_FIREBASE);
+            body.track.info.permission = 'granted';
+            this.trackService(body);
+            return;
+        }
 
-        body.track.info.permission = Notification.permission;
-        this.trackService(body);
+        // body.track.info.token = null;
+        // body.track.info.permission = Notification.permission;
+        // this.trackService(body);
 
         const deviceId = window.localStorage.getItem(ConfigSDK.DEVICE_ID);
         console.log('deviceId :', deviceId);
@@ -131,11 +141,34 @@ export class FuncGlobal {
 
         Notification.requestPermission().then((permission) => {
             if ('permissions' in navigator) {
+                console.log('navigator :', navigator);
                 navigator.permissions.query({ name: 'notifications' })
                     .then(notificationPerm => {
-                        notificationPerm.onchange = () => {
-                            console.log('permission :', permission);
-                            body.track.info.permission = permission;
+                        
+                        console.log('notificationPerm :', notificationPerm);
+                        notificationPerm.onchange = async (status) => {
+                            // const newState: any = status.target.state;
+                            // console.log('notificationPerm state:', notificationPerm.state);
+                            // console.log('status:', status);
+                            // console.log('status currentTarget:', status.currentTarget);
+                            // console.log('permission onchange:', permission);
+                            // status.currentTarget.addEventListener('change', e => {
+                            //     console.log('currentTarget e:', e);
+                            // })
+                            console.log('change');
+                            try {
+                                console.log('change try :', firebase);
+                                console.log('change try2 :', firebase.getFirebase());
+                                // const firebase = getFirebase()
+                                const token = await firebase.messaging().getToken();
+                                console.log('notificationPerm.onchange token:', token);
+                                window.localStorage.setItem(ConfigSDK.TOKEN_FIREBASE, token);
+                            } catch (error) {
+                                console.error('notificationPerm.onchange :', error);
+                            }
+                            body.track.info.token = window.localStorage.getItem(ConfigSDK.TOKEN_FIREBASE);
+                            body.track.info.permission = notificationPerm.state
+                            console.log('body :', body);
                             this.trackService(body);
                         }
                     });
@@ -146,6 +179,38 @@ export class FuncGlobal {
 
     }
 
+    /**
+     * Not Using
+     */
+    requestPermission() {
+        const deviceId = window.localStorage.getItem(ConfigSDK.DEVICE_ID);
+        if (deviceId === null) return;
+
+        const body = this.setDataHttp('register_notification_permission', {})
+        body.track.info.token = window.localStorage.getItem(ConfigSDK.TOKEN_FIREBASE);
+        Notification.requestPermission().then((permission) => {
+            if ('permissions' in navigator) {
+                navigator.permissions.query({ name: 'notifications' })
+                    .then(notificationPerm => {
+                        
+                        console.log('notificationPerm :', notificationPerm);
+                        notificationPerm.onchange = (status) => {
+                            body.track.info.permission = notificationPerm.state
+                            console.log('body :', body);
+                            this.trackService(body);
+                        }
+                    });
+            }
+        }).catch((err) => {
+            console.error(err);
+        });
+    }
+
+    /**
+     * Return data body API
+     * @param type 
+     * @param data 
+     */
     setDataHttp(type: string, data: any) {
         const page = new GetDataPage();
         return {
@@ -173,10 +238,13 @@ export class FuncGlobal {
         }
     }
 
+    /**
+     * Send data track to server
+     * @param body 
+     */
     async trackService(body) {
         try {
             let http = new HttpRequestService();
-            console.log('trackService');
             const result: IHttpResponse = await http.post(SERVICE_URL.TRACK, body);
             if (result.code !== 200) {
                 return;
@@ -190,6 +258,17 @@ export class FuncGlobal {
         } catch (error) {
             console.log('track error :', error);
         }
+    }
+
+    /**
+     * Send value permission notification when user visit website or user change permission notification on browser
+     * @param permission 
+     */
+    sendPermissionToServer(permission: string) {
+        const body = this.setDataHttp('register_notification_permission', {})
+        body.track.info.permission = permission;
+        body.track.info.token = window.localStorage.getItem(ConfigSDK.TOKEN_FIREBASE);
+        this.trackService(body);
     }
 
     // showNotification() {
