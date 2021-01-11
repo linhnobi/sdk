@@ -59,11 +59,21 @@ self.addEventListener('push', (event) => {
     }
     const init = {
         method: 'post',
-        headers : {"Content-Type" : "application/json"},
+        headers: new Headers({
+            'Content-Type':'application/json'
+        }),
         body: JSON.stringify(bodyService),
     };
 
-    self.fetch('https://api-test1.mobio.vn/nm/webhook/api/v2.0/webhook/channel/webpush/batch', init)
+    const url = 'https://api-test1.mobio.vn/nm/webhook/api/v2.0/webhook/channel/webpush/batch';
+
+    self.fetch(url, init)
+        .then(response => {
+
+        })
+        .catch(error => {
+            console.error(error);
+        })
 
     event.waitUntil(
         self.registration.showNotification(title, body)
