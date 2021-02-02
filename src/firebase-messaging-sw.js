@@ -46,7 +46,7 @@ self.addEventListener('push', (event) => {
     console.log('body', body);
     var messageId = data.data.message_id
     console.log('messageId', messageId);
-
+    // alert('1111111111111111');
     var bodyService = {
         data: [
             {
@@ -102,6 +102,8 @@ self.addEventListener('push', (event) => {
 self.addEventListener("notificationclick", function (t) {
     console.log('notificationclick :', t);
 });
+
+self.addEventListener("notificationshow", (event) => {});
 
 // // const messaging = firebase.messaging();
 

@@ -10,7 +10,7 @@ export class FireBase {
     }
 
     init(config?: any) {
-        // var config = {
+        // var configx = {
         //     apiKey: "AIzaSyAHVJx4p9hQVMAknaH2ocNKnL9v0pb3lXw",
         //     authDomain: "webpushdemo-6edfe.firebaseapp.com",
         //     projectId: "webpushdemo-6edfe",
@@ -19,7 +19,9 @@ export class FireBase {
         //     appId: "1:994621199473:web:49decf39db04b524c037d0",
         //     measurementId: "G-CWRPY7S2NW"
         // };
-
+        try {
+            
+        
         firebase.initializeApp(config);
         const messaging = firebase.messaging();
 
@@ -60,12 +62,25 @@ export class FireBase {
             })
         }
 
+        const deviceId = window.localStorage.getItem(ConfigSDK.DEVICE_ID);
+        console.log('deviceId :', deviceId);
+        if (deviceId === null) {~
+            console.log('null');
+        } else {
+            console.log('not null');
+        }
+
+
         /**
          * - Request permission notification in browser
          * - Listen value permission notification when user change permission notification of browser
          * - Send permission notification to server
          */
-        Notification.requestPermission().then((permission) => {
+        console.log('requestPermission 222');
+        Notification.requestPermission(test => {
+            console.log('requestPermission');
+        }).then((permission) => {
+            
             if ('permissions' in navigator) {
                 navigator.permissions.query({ name: 'notifications' })
                     .then(notificationPerm => {
@@ -140,7 +155,9 @@ export class FireBase {
         //                 console.error('Push notification subscription error: ', error);
         //             })
         //     });
-
+        } catch (error) {
+            console.log('error init:', error); 
+        }
 
     }
 
