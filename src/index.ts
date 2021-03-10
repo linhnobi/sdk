@@ -160,13 +160,17 @@ export class SDK {
         // console.log(JSON.stringify(pageInfo));
     }
 
-    async listenGTM(track: string) {
+    async listenGTM(track: string, dataTrack: any) {
         console.log('track :', track);
         // if (track !== 'view') {
         //     return;
         // }
         const data = {
-            url: window.document.URL
+            url: window.document.URL,
+            direction: dataTrack?.direction,
+            value: dataTrack?.value.toString(),
+            unit: dataTrack?.unit,
+            // page_id: dataTrack?.page_id
         };
         let httpRequest = new HttpRequestService();
         let trackClass = new Track(httpRequest);
