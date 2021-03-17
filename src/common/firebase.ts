@@ -63,12 +63,12 @@ export class FireBase {
         }
 
         const deviceId = window.localStorage.getItem(ConfigSDK.DEVICE_ID);
-        console.log('deviceId :', deviceId);
-        if (deviceId === null) {~
-            console.log('null');
-        } else {
-            console.log('not null');
-        }
+        // console.log('deviceId :', deviceId);
+        // if (deviceId === null) {
+        //     console.log('null');
+        // } else {
+        //     console.log('not null');
+        // }
 
 
         /**

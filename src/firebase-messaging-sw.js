@@ -99,11 +99,30 @@ self.addEventListener('push', (event) => {
 //   );
 // });
 
-self.addEventListener("notificationclick", function (t) {
-    console.log('notificationclick :', t);
+self.addEventListener("notificationclick", (event) => {
+    console.log('notificationclick :', event);
+    const url = 'https://test25.mobio.vn/';
+    event.notification.close();
+    event.waitUntil(
+        clients.matchAll({ type: 'window'}).then( wdClient => {
+            // Check if there is already a window/ tab open width the target URL
+            for (let i = 0; i < wdClient.length; i++) {
+                const client = wdClient[i];
+                if (client.url === url && 'focus' in client) {
+                    return client.focus();
+                }             
+            }
+            // If not, the open then target URL in a new window/tab.
+            if (clients.openWindow) {
+                clients.openWindow(url);
+            }
+        })
+    );
 });
 
-self.addEventListener("notificationshow", (event) => {});
+self.addEventListener("notificationshow", (event) => {
+    console.log('notificationShow :', event);
+});
 
 // // const messaging = firebase.messaging();
 

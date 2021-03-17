@@ -165,16 +165,20 @@ export class SDK {
         // if (track !== 'view') {
         //     return;
         // }
-        const data = {
-            url: window.document.URL,
-            direction: dataTrack?.direction,
-            value: dataTrack?.value.toString(),
-            unit: dataTrack?.unit,
-            // page_id: dataTrack?.page_id
-        };
-        let httpRequest = new HttpRequestService();
-        let trackClass = new Track(httpRequest);
-        await trackClass.inti(track, data);
+        try {
+            const data = {
+                url: window.document.URL,
+                direction: dataTrack?.direction,
+                value: dataTrack?.value?.toString(),
+                unit: dataTrack?.unit,
+                // page_id: dataTrack?.page_id
+            };
+            let httpRequest = new HttpRequestService();
+            let trackClass = new Track(httpRequest);
+            await trackClass.inti(track, data);
+        } catch (error) {
+            console.log('track error',error);
+        }
     }
 
     /**
