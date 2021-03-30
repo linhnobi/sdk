@@ -11,8 +11,6 @@ export class Track {
     }
 
     async inti(type: string, data: any) {
-        console.log('inti track');
-        // console.log('httpRequest2 :', httpRequest2);
         const page = new GetDataPage();
 
         const body = {
@@ -40,7 +38,6 @@ export class Track {
         }
 
         try {
-            console.log('11111 ? :', this.httpRequest);
             const result: IHttpResponse = await this.httpRequest.post(SERVICE_URL.TRACK, body);
             if (result.code !== 200) {
                 return;

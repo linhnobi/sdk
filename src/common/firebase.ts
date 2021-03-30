@@ -25,18 +25,6 @@ export class FireBase {
         firebase.initializeApp(config);
         const messaging = firebase.messaging();
 
-        // console.log('messaging' ,messaging);
-
-        // console.log('isSupported :', firebase.messaging.isSupported());
-
-
-        messaging.deleteToken()
-            .then(result => {
-                console.log('result :', result);
-            }).catch(error => {
-                console.error('error :', error);
-            });
-
         /**
          * - Register firebase service worker
          * - Get token in Firebase
@@ -46,15 +34,7 @@ export class FireBase {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('firebase-messaging-sw.js')
                     .then(registration => {
-                        messaging.getToken()
-                            .then(token => {
-                                window.localStorage.setItem(ConfigSDK.TOKEN_FIREBASE, token);
-                                this.funcGlobal.sendPermissionToServer(Notification.permission);
-                            })
-                            .catch(error => {
-                                window.localStorage.setItem(ConfigSDK.TOKEN_FIREBASE, null);
-                                this.funcGlobal.sendPermissionToServer(Notification.permission);
-                            });
+                        console.log('registration service worker success');
                     })
                     .catch(error => {
                         console.log('registration service worker:', error);
@@ -63,13 +43,19 @@ export class FireBase {
         }
 
         const deviceId = window.localStorage.getItem(ConfigSDK.DEVICE_ID);
-        // console.log('deviceId :', deviceId);
-        // if (deviceId === null) {
-        //     console.log('null');
-        // } else {
-        //     console.log('not null');
-        // }
 
+        const oldToken = window.localStorage.getItem(ConfigSDK.TOKEN_FIREBASE);
+        if (!oldToken) {
+            messaging.getToken()
+                .then(token => {
+                    window.localStorage.setItem(ConfigSDK.TOKEN_FIREBASE, token);
+                    this.funcGlobal.sendPermissionToServer(Notification.permission);
+                })
+                .catch(error => {
+                    window.localStorage.removeItem(ConfigSDK.TOKEN_FIREBASE);
+                    this.funcGlobal.sendPermissionToServer(Notification.permission);
+                });
+        }
 
         /**
          * - Request permission notification in browser
@@ -84,6 +70,10 @@ export class FireBase {
             if ('permissions' in navigator) {
                 navigator.permissions.query({ name: 'notifications' })
                     .then(notificationPerm => {
+                        if (notificationPerm.state === 'denied') {
+                            window.localStorage.removeItem(ConfigSDK.TOKEN_FIREBASE);
+                            this.funcGlobal.sendPermissionToServer(notificationPerm.state);
+                        }
                         notificationPerm.onchange = async (status) => {
                             try {
                                 messaging.getToken()
@@ -93,7 +83,7 @@ export class FireBase {
                                     }).catch(error => {
                                         if (error.code === "messaging/permission-blocked" || error.code === "messaging/permission-default") {
                                             console.log("messaging not per");
-                                            window.localStorage.setItem(ConfigSDK.TOKEN_FIREBASE, null);
+                                            window.localStorage.removeItem(ConfigSDK.TOKEN_FIREBASE);
                                             this.funcGlobal.sendPermissionToServer(notificationPerm.state);
                                         } else {
                                             console.error("Error Occurred", error);
