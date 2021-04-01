@@ -7,6 +7,7 @@ import { F5 } from "./common/util/f5";
 import { ConfigDetailPage } from "./config/detail.page";
 import { SERVICE_URL } from "./config/service";
 import { HttpRequestService } from "./service/http-request";
+import { ConfigSDK } from './config/config';
 
 export class SDK {
     // timeOnsite = 5;
@@ -39,6 +40,7 @@ export class SDK {
         
         const configFireBase = await this.getConfigFireBase();
         this.firebase.init(configFireBase);
+        window.localStorage.setItem(ConfigSDK.FAVICON,this.funcGlobal.getFavicon());
         // this.funcGlobal.checkNotificationPermission(this.firebase);
         // console.log('configFireBase', configFireBase);
         // console.log('111111111111');

@@ -5,7 +5,6 @@ import { SERVICE_URL } from "../config/service";
 import { HttpRequestService } from "../service/http-request";
 import { GetDataPage } from "./util/data-page";
 
-// module SomeModule {
 export class FuncGlobal {
 
     /**
@@ -114,97 +113,97 @@ export class FuncGlobal {
      * Note Using
      * @param firebase 
      */
-    checkNotificationPermission(firebase) {
-        const body = this.setDataHttp('register_notification_permission', {})
-        if (!window.Notification) {
-            body.track.info.token = null;
-            body.track.info.permission = 'not_support';
-            this.trackService(body);
-            return;
-        }
+    // checkNotificationPermission(firebase) {
+    //     const body = this.setDataHttp('register_notification_permission', {})
+    //     if (!window.Notification) {
+    //         body.track.info.token = null;
+    //         body.track.info.permission = 'not_support';
+    //         this.trackService(body);
+    //         return;
+    //     }
 
-        if (Notification.permission === 'granted') {
-            console.log('permission :', Notification.permission);
-            body.track.info.token = window.localStorage.getItem(ConfigSDK.TOKEN_FIREBASE);
-            body.track.info.permission = 'granted';
-            this.trackService(body);
-            return;
-        }
+    //     if (Notification.permission === 'granted') {
+    //         console.log('permission :', Notification.permission);
+    //         body.track.info.token = window.localStorage.getItem(ConfigSDK.TOKEN_FIREBASE);
+    //         body.track.info.permission = 'granted';
+    //         this.trackService(body);
+    //         return;
+    //     }
 
-        // body.track.info.token = null;
-        // body.track.info.permission = Notification.permission;
-        // this.trackService(body);
+    //     // body.track.info.token = null;
+    //     // body.track.info.permission = Notification.permission;
+    //     // this.trackService(body);
 
-        const deviceId = window.localStorage.getItem(ConfigSDK.DEVICE_ID);
-        console.log('deviceId :', deviceId);
-        if (deviceId === null) return;
+    //     const deviceId = window.localStorage.getItem(ConfigSDK.DEVICE_ID);
+    //     console.log('deviceId :', deviceId);
+    //     if (deviceId === null) return;
 
-        Notification.requestPermission().then((permission) => {
-            if ('permissions' in navigator) {
-                console.log('navigator :', navigator);
-                navigator.permissions.query({ name: 'notifications' })
-                    .then(notificationPerm => {
-                        
-                        console.log('notificationPerm :', notificationPerm);
-                        notificationPerm.onchange = async (status) => {
-                            // const newState: any = status.target.state;
-                            // console.log('notificationPerm state:', notificationPerm.state);
-                            // console.log('status:', status);
-                            // console.log('status currentTarget:', status.currentTarget);
-                            // console.log('permission onchange:', permission);
-                            // status.currentTarget.addEventListener('change', e => {
-                            //     console.log('currentTarget e:', e);
-                            // })
-                            console.log('change');
-                            try {
-                                console.log('change try :', firebase);
-                                console.log('change try2 :', firebase.getFirebase());
-                                // const firebase = getFirebase()
-                                const token = await firebase.messaging().getToken();
-                                console.log('notificationPerm.onchange token:', token);
-                                window.localStorage.setItem(ConfigSDK.TOKEN_FIREBASE, token);
-                            } catch (error) {
-                                console.error('notificationPerm.onchange :', error);
-                            }
-                            body.track.info.token = window.localStorage.getItem(ConfigSDK.TOKEN_FIREBASE);
-                            body.track.info.permission = notificationPerm.state
-                            console.log('body :', body);
-                            this.trackService(body);
-                        }
-                    });
-            }
-        }).catch((err) => {
-            console.error(err);
-        });
+    //     Notification.requestPermission().then((permission) => {
+    //         if ('permissions' in navigator) {
+    //             console.log('navigator :', navigator);
+    //             navigator.permissions.query({ name: 'notifications' })
+    //                 .then(notificationPerm => {
 
-    }
+    //                     console.log('notificationPerm :', notificationPerm);
+    //                     notificationPerm.onchange = async (status) => {
+    //                         // const newState: any = status.target.state;
+    //                         // console.log('notificationPerm state:', notificationPerm.state);
+    //                         // console.log('status:', status);
+    //                         // console.log('status currentTarget:', status.currentTarget);
+    //                         // console.log('permission onchange:', permission);
+    //                         // status.currentTarget.addEventListener('change', e => {
+    //                         //     console.log('currentTarget e:', e);
+    //                         // })
+    //                         console.log('change');
+    //                         try {
+    //                             console.log('change try :', firebase);
+    //                             console.log('change try2 :', firebase.getFirebase());
+    //                             // const firebase = getFirebase()
+    //                             const token = await firebase.messaging().getToken();
+    //                             console.log('notificationPerm.onchange token:', token);
+    //                             window.localStorage.setItem(ConfigSDK.TOKEN_FIREBASE, token);
+    //                         } catch (error) {
+    //                             console.error('notificationPerm.onchange :', error);
+    //                         }
+    //                         body.track.info.token = window.localStorage.getItem(ConfigSDK.TOKEN_FIREBASE);
+    //                         body.track.info.permission = notificationPerm.state
+    //                         console.log('body :', body);
+    //                         this.trackService(body);
+    //                     }
+    //                 });
+    //         }
+    //     }).catch((err) => {
+    //         console.error(err);
+    //     });
 
-    /**
-     * Not Using
-     */
-    requestPermission() {
-        const deviceId = window.localStorage.getItem(ConfigSDK.DEVICE_ID);
-        if (deviceId === null) return;
+    // }
 
-        const body = this.setDataHttp('register_notification_permission', {})
-        body.track.info.token = window.localStorage.getItem(ConfigSDK.TOKEN_FIREBASE);
-        Notification.requestPermission().then((permission) => {
-            if ('permissions' in navigator) {
-                navigator.permissions.query({ name: 'notifications' })
-                    .then(notificationPerm => {
-                        
-                        console.log('notificationPerm :', notificationPerm);
-                        notificationPerm.onchange = (status) => {
-                            body.track.info.permission = notificationPerm.state
-                            console.log('body :', body);
-                            this.trackService(body);
-                        }
-                    });
-            }
-        }).catch((err) => {
-            console.error(err);
-        });
-    }
+    // /**
+    //  * Not Using
+    //  */
+    // requestPermission() {
+    //     const deviceId = window.localStorage.getItem(ConfigSDK.DEVICE_ID);
+    //     if (deviceId === null) return;
+
+    //     const body = this.setDataHttp('register_notification_permission', {})
+    //     body.track.info.token = window.localStorage.getItem(ConfigSDK.TOKEN_FIREBASE);
+    //     Notification.requestPermission().then((permission) => {
+    //         if ('permissions' in navigator) {
+    //             navigator.permissions.query({ name: 'notifications' })
+    //                 .then(notificationPerm => {
+
+    //                     console.log('notificationPerm :', notificationPerm);
+    //                     notificationPerm.onchange = (status) => {
+    //                         body.track.info.permission = notificationPerm.state
+    //                         console.log('body :', body);
+    //                         this.trackService(body);
+    //                     }
+    //                 });
+    //         }
+    //     }).catch((err) => {
+    //         console.error(err);
+    //     });
+    // }
 
     /**
      * Return data body API
@@ -271,32 +270,20 @@ export class FuncGlobal {
         this.trackService(body);
     }
 
-    // showNotification() {
-    //     var options = 
-    //     {
-    //         body: 'test',
-    //         // icon: config.icon_notification, // 100*100px and less than 20kb in size.
-    //         // image: productImage,
-    //     }
-    //     // requireInteration: If this is set as true, then the notification remains active until the user dismiss it or opens it.
-
-    //     // silent: To show the notification silently without any sound effect.
-
-    //     //vibrate: To make the device vibrate if it supports vibration.
-
-    //     // Button : support chrome, not support FireFox, Safari
-
-    //     console.log('options :', options);
-    //     var notify = new Notification('Hi there!', options);
-    //         notify.onclick = function(event) {
-    //         event.preventDefault();
-    //         // window.open(url, '_blank');
-    //     }
-    //     // previousXPos = xPos;
-    //     // previousYPos = xPos;
-    //     console.log('showNotification');
-    //     // isClick = false;
-    // }
+    /**
+    * Return favicon of website
+    */
+    getFavicon(): string {
+        const param = 'link[href*="favicon.ico"]';
+        const links = document.querySelectorAll(param);
+        if (links.length === 0) {
+            return '';
+        }
+        let href = '';
+        links.forEach((link: HTMLLinkElement) => {
+            href = link.href;
+        });
+        return href;
+    }
 
 }
-// }

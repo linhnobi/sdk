@@ -1,32 +1,7 @@
 importScripts('https://www.gstatic.com/firebasejs/8.2.0/firebase-app.js');
 importScripts('https://www.gstatic.com/firebasejs/8.2.0/firebase-messaging.js');
 
-// var firebaseConfig = {
-//     apiKey: "AIzaSyAHVJx4p9hQVMAknaH2ocNKnL9v0pb3lXw",
-//     authDomain: "webpushdemo-6edfe.firebaseapp.com",
-//     projectId: "webpushdemo-6edfe",
-//     storageBucket: "webpushdemo-6edfe.appspot.com",
-//     messagingSenderId: "994621199473",
-//     appId: "1:994621199473:web:49decf39db04b524c037d0",
-//     measurementId: "G-CWRPY7S2NW"
-//   };
-//   // Initialize Firebase
-//   firebase.initializeApp(firebaseConfig);
-
-
-//   const messaging = firebase.messaging();
-
-
-//   messaging.getToken()
-//     .then(token => {
-//         console.log('token :', token);
-//         localStorage.setItem('token', token);
-//     })
-//     .catch(error => {
-//         console.log('error :', error);
-//     })
-
-//     messaging.on
+console.log('self :', self);
 
 
 self.addEventListener('push', (event) => {
@@ -40,10 +15,13 @@ self.addEventListener('push', (event) => {
         body: data.notification.body,
         tag: data.notification.tag || data.data.tag,
         image: data.notification.image || data.data.image,
-        // requireInteraction: true
     };
-
-    console.log('body', body);
+    // icon: self.SDK.funcGlobal.getFavicon(),
+    // actions: [{action: data.data.url_target, title: "Đồng Ý"}]
+    self.urlTarget =  data?.data?.url_target;
+    console.log('url_target', urlTarget);
+    // console.log('FAVICON', win.localStorage.getItem('m_favicon'));
+    console.log('FAVICON', self);
     var messageId = data.data.message_id
     console.log('messageId', messageId);
     // alert('1111111111111111');
@@ -101,8 +79,12 @@ self.addEventListener('push', (event) => {
 
 self.addEventListener("notificationclick", (event) => {
     console.log('notificationclick :', event);
-    const url = 'https://test25.mobio.vn/';
+    const url = self.urlTarget;
     event.notification.close();
+    if (!url) {
+        return;
+    }
+    console.log('url_target', self.urlTarget);
     event.waitUntil(
         clients.matchAll({ type: 'window'}).then( wdClient => {
             // Check if there is already a window/ tab open width the target URL
