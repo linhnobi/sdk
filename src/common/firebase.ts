@@ -32,6 +32,9 @@ export class FireBase {
          */
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
+                // if (navigator && navigator.serviceWorker) {
+                //     return;
+                // }
                 navigator.serviceWorker.register('firebase-messaging-sw.js')
                     .then(registration => {
                         console.log('registration service worker success');
@@ -62,9 +65,7 @@ export class FireBase {
          * - Listen value permission notification when user change permission notification of browser
          * - Send permission notification to server
          */
-        console.log('requestPermission 222');
         Notification.requestPermission(test => {
-            console.log('requestPermission');
         }).then((permission) => {
             
             if ('permissions' in navigator) {

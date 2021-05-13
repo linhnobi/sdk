@@ -19,7 +19,6 @@ export class SDK {
     constructor() {
         this.httpRequest = new HttpRequestService();
         // this.track = new Track(this.httpRequest);
-        console.log('constructor');
     }
 
     async inti() {
@@ -29,7 +28,6 @@ export class SDK {
     }
 
     async start(document?: any) {
-        console.log('start');
         this.f5.addJS();
         this.funcGlobal.createDraftDevice();
         const isSafari = this.funcGlobal.detectSafariBrowser();
@@ -163,7 +161,8 @@ export class SDK {
     }
 
     async listenGTM(track: string, dataTrack: any) {
-        console.log('track :', track);
+        console.log('Kiểu event :', track);
+        console.log('Dữ liệu event :', dataTrack);
         // if (track !== 'view') {
         //     return;
         // }
